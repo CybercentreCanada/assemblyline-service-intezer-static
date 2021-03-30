@@ -1,0 +1,41 @@
+name: IntezerStatic
+version: $SERVICE_TAG
+description: Fetch the Intezer results of the submitted file's sha256
+
+accepts: .*
+rejects: empty|metadata/.*
+
+stage: CORE
+category: External
+
+file_required: true
+timeout: 120
+disable_cache: false
+
+enabled: false
+is_external: true
+licence_count: 0
+
+heuristics:
+  - heur_id: 1
+    name: Intezer consider this file as malicious
+    score: 2000
+    filetype: .*
+    description: Intezer consider this file as malicious
+  - heur_id: 2
+    name: Intezer consider this file as suspicious
+    score: 1000
+    filetype: .*
+    description: Intezer consider this file as suspicious
+
+submission_params:
+  - default: ""
+    name: api_key
+    type: str
+    value: ""
+
+docker_config:
+  image: x1mus/assemblyline-service-intezer-static:$SERVICE_TAG
+  cpu_cores: 1
+  ram_mb: 256
+  allow_internet_access: true
