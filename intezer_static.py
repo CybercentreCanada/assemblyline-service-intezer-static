@@ -32,29 +32,31 @@ class IntezerStatic(ServiceBase):
 					main_kv_section.set_heuristic(2)
 
 				sub_analysis = client.get_sub_analysis(main_api_result["analysis_id"])
+				try:
+					for sub in sub_analysis["sub_analyses"]:
+						code_reuse = client.get_code_reuse(main_api_result["analysis_id"], sub["sub_analysis_id"])
+						metadata = client.get_metadata(main_api_result["analysis_id"], sub["sub_analysis_id"])
 
-				for sub in sub_analysis["sub_analyses"]:
-					code_reuse = client.get_code_reuse(main_api_result["analysis_id"], sub["sub_analysis_id"])
-					metadata = client.get_metadata(main_api_result["analysis_id"], sub["sub_analysis_id"])
+						# Adding the "code reuse" + "metadata" to the subanalysis dictionnary
+						sub.update(code_reuse)
+						sub.update(metadata)
 
-					# Adding the "code reuse" + "metadata" to the subanalysis dictionnary
-					sub.update(code_reuse)
-					sub.update(metadata)
+						# Removing the empty values
+						sub.pop("error", None)
 
-					# Removing the empty values
-					sub.pop("error", None)
+						families = sub.pop("families", None)
+						extraction_info = sub.pop("extraction_info", None)
 
-					families = sub.pop("families", None)
-					extraction_info = sub.pop("extraction_info", None)
+						sub_kv_section = ResultSection("Subanalysis report for " + sub["sub_analysis_id"], body_format=BODY_FORMAT.KEY_VALUE, body=json.dumps(sub), parent=main_kv_section)
+						if families:
+							for family in families:
+								ResultSection("Family report for the subanalysis", body_format=BODY_FORMAT.KEY_VALUE, body=json.dumps(family), parent=sub_kv_section)
 
-					sub_kv_section = ResultSection("Subanalysis report for " + sub["sub_analysis_id"], body_format=BODY_FORMAT.KEY_VALUE, body=json.dumps(sub), parent=main_kv_section)
-					if families:
-						for family in families:
-							ResultSection("Family report for the subanalysis", body_format=BODY_FORMAT.KEY_VALUE, body=json.dumps(family), parent=sub_kv_section)
-
-					if extraction_info:
-						for info in extraction_info["processes"]:
-							ResultSection("Extraction informations for the subanalysis", body_format=BODY_FORMAT.KEY_VALUE, body=json.dumps(info), parent=sub_kv_section)
+						if extraction_info:
+							for info in extraction_info["processes"]:
+								ResultSection("Extraction informations for the subanalysis", body_format=BODY_FORMAT.KEY_VALUE, body=json.dumps(info), parent=sub_kv_section)
+				except KeyError:
+					pass
 
 				result.add_section(main_kv_section)
 			request.result = result
