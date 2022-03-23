@@ -1,5 +1,5 @@
 name: IntezerStatic
-version: $SERVICE_TAG
+version: 4.2.0.stable1
 description: Fetch the Intezer results of the submitted file's sha256
 
 accepts: .*
@@ -35,7 +35,7 @@ submission_params:
     value: ""
 
 docker_config:
-  image: ghcr.io/nvisosecurity/assemblyline-service-intezer-static:$SERVICE_TAG
+  image: ghcr.io/nvisosecurity/assemblyline-service-intezer:main
   cpu_cores: 1
   ram_mb: 256
   allow_internet_access: true
