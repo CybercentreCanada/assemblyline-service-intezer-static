@@ -2,6 +2,15 @@ name: IntezerStatic
 version: 4.2.0.stable1
 description: Fetch the Intezer results of the submitted file's sha256
 
+# TODO: From the user guide
+# The following file formats are currently supported:
+# • Windows Executable Files (PE) – exe, .dll, .sys – native x86, native x64 and .NET.
+# • Linux Executable Files (ELF) – native x86, native x64, ARM32, ARM64
+# • Compressed files that contain one file - Zip, RAR, TAR, 7-Zip
+# • Android applications (APK)• Installers - msi, trusted installer, Inno setup...
+# • Microsoft Office - doc, xls, ppt, etc.
+# • PDF
+# • Scripts - powershell, vbs, js
 accepts: .*
 rejects: empty|metadata/.*
 
@@ -9,33 +18,81 @@ stage: CORE
 category: External
 
 file_required: true
-timeout: 120
+timeout: 60
 disable_cache: false
 
 enabled: false
 is_external: true
 licence_count: 0
 
-heuristics:
-  - heur_id: 1
-    name: Intezer consider this file as malicious
-    score: 2000
-    filetype: .*
-    description: Intezer consider this file as malicious
-  - heur_id: 2
-    name: Intezer consider this file as suspicious
-    score: 1000
-    filetype: .*
-    description: Intezer consider this file as suspicious
+config:
+  # Don't forget the /api/ at the end of the URL!
+  base_url: https://analyze.intezer.com/api/
+  api_version: v2-0
+  api_key: sample_api_key
+  private_only: false
+  is_on_premise: false
 
 submission_params:
   - default: ""
-    name: api_key
+    name: analysis_id
     type: str
     value: ""
 
+heuristics:
+  - heur_id: 1
+    name: File is malicious
+    score: 1000
+    filetype: .*
+    description: Intezer considers this file malicious
+  - heur_id: 2
+    name: File is suspicious
+    score: 500
+    filetype: .*
+    description: Intezer considers this file suspicious
+  - heur_id: 4
+    name: Generic signature raised
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 5
+    name: Command And Control
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 6
+    name: Credential Access
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 7
+    name: Defense Evasion
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 8
+    name: Discovery
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 9
+    name: Execution
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 10
+    name: Persistence
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+  - heur_id: 11
+    name: Collection
+    score: 0
+    filetype: .*
+    description: Intezer raised a signature
+
 docker_config:
-  image: ghcr.io/nvisosecurity/assemblyline-service-intezer:main
-  cpu_cores: 1
-  ram_mb: 256
   allow_internet_access: true
+  image: ${REGISTRY}cccs/assemblyline-service-intezer-static:$SERVICE_TAG
+  cpu_cores: 0.5
+  ram_mb: 256
