@@ -4,10 +4,11 @@ ENV SERVICE_PATH intezer_static.IntezerStatic
 
 USER root
 
-RUN apt update
-RUN pip3 install requests
+RUN apt-get update
 
 USER assemblyline
+
+RUN pip install intezer-sdk && rm -rf ~/.cache/pip
 
 WORKDIR /opt/al_service
 COPY . .
