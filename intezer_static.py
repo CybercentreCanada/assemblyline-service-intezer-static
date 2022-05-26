@@ -207,6 +207,9 @@ class ALIntezerApi(IntezerApi):
                 return False
             else:
                 raise
+        except FileExistsError:
+            # Duplicate file
+            pass
 
 
 class IntezerStatic(ServiceBase):
@@ -273,8 +276,12 @@ class IntezerStatic(ServiceBase):
         )
         main_kv_section.update_items(processed_main_api_result)
         if "family_name" in main_api_result:
+            # Tag both, ask forgiveness later
             main_kv_section.add_tag(
-                "attribution.family", main_api_result["family_name"]
+                "attribution.implant", main_api_result["family_name"]
+            )
+            main_kv_section.add_tag(
+                "attribution.actor", main_api_result["family_name"]
             )
 
         # This file-verdict map will be used later on to assign heuristics to sub-analyses
@@ -612,8 +619,9 @@ class IntezerStatic(ServiceBase):
             )
             family_section.add_row(TableRow(**processed_family))
             family_type = family["family_type"]
-            if family_type not in FAMILIES_TO_NOT_TAG:
-                family_section.add_tag("attribution.family", family["family_name"])
+            # TODO: Do not tag these sub families, for the time being at least
+            # if family_type not in FAMILIES_TO_NOT_TAG:
+            #     family_section.add_tag("attribution.family", family["family_name"])
 
             # Overwrite value if not malicious
             if family_type in MALICIOUS_FAMILY_TYPES and (
