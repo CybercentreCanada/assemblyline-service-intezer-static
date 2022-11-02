@@ -139,6 +139,7 @@ class ALIntezerApi(IntezerApi):
                             private_only: bool = False,
                             **additional_parameters) -> Optional[Dict]:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 return IntezerApi.get_latest_analysis(
@@ -148,10 +149,12 @@ class ALIntezerApi(IntezerApi):
                     additional_parameters=additional_parameters
                 )
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to get the latest analysis for SHA256 {file_hash} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to get the latest analysis for SHA256 {file_hash} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -162,24 +165,29 @@ class ALIntezerApi(IntezerApi):
                     )
                     return None
                 else:
-                    self.log.error(
-                        "The intezer web service is most likely down. "
-                        f"Indicator: Unable to get the latest analysis for SHA256 {file_hash} due to '{e}'."
-                    )
+                    if not logged:
+                        self.log.error(
+                            "The intezer web service is most likely down. "
+                            f"Indicator: Unable to get the latest analysis for SHA256 {file_hash} due to '{e}'."
+                        )
+                        logged = True
                     sleep(5)
                     continue
 
     # Overriding the class method to handle if the HTTPError exists
     def get_iocs(self, analysis_id: str) -> Dict[str, List[Dict[str, str]]]:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 return IntezerApi.get_iocs(self=self, analyses_id=analysis_id)
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to retrieve IOCs for analysis ID {analysis_id} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to retrieve IOCs for analysis ID {analysis_id} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -190,24 +198,29 @@ class ALIntezerApi(IntezerApi):
                     )
                     return {"files": [], "network": []}
                 else:
-                    self.log.error(
-                        "The intezer web service is most likely down. "
-                        f"Indicator: Unable to retrieve IOCs for analysis ID {analysis_id} due to '{e}'."
-                    )
+                    if not logged:
+                        self.log.error(
+                            "The intezer web service is most likely down. "
+                            f"Indicator: Unable to retrieve IOCs for analysis ID {analysis_id} due to '{e}'."
+                        )
+                        logged = True
                     sleep(5)
                     continue
 
     # Overriding the class method to handle if the HTTPError or UnsupportedOnPremiseVersion exists
     def get_dynamic_ttps(self, analysis_id: str) -> List[Dict[str, str]]:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 return IntezerApi.get_dynamic_ttps(self=self, analyses_id=analysis_id)
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -218,10 +231,12 @@ class ALIntezerApi(IntezerApi):
                     )
                     return []
                 else:
-                    self.log.error(
-                        "The intezer web service is most likely down. "
-                        f"Indicator: Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
-                    )
+                    if not logged:
+                        self.log.error(
+                            "The intezer web service is most likely down. "
+                            f"Indicator: Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
+                        )
+                        logged = True
                     sleep(5)
                     continue
             except UnsupportedOnPremiseVersion as e:
@@ -233,14 +248,17 @@ class ALIntezerApi(IntezerApi):
     # Overriding the class method to handle if the HTTPError exists
     def get_sub_analyses_by_id(self, analysis_id: str) -> List[Dict[str, Any]]:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 return IntezerApi.get_sub_analyses_by_id(self=self, analysis_id=analysis_id)
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to get sub_analyses for analysis ID {analysis_id} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to get sub_analyses for analysis ID {analysis_id} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -252,16 +270,19 @@ class ALIntezerApi(IntezerApi):
     # Overriding the class method to handle if the network connection cannot be made
     def get_sub_analysis_code_reuse_by_id(self, analysis_id: str, sub_analysis_id: str) -> Optional[Dict[str, Any]]:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 return IntezerApi.get_sub_analysis_code_reuse_by_id(
                     self=self, composed_analysis_id=analysis_id, sub_analysis_id=sub_analysis_id
                 )
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to get sub_analyses code re-use for analysis ID {analysis_id} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to get sub_analyses code re-use for analysis ID {analysis_id} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -273,16 +294,19 @@ class ALIntezerApi(IntezerApi):
     # Overriding the class method to handle if the network connection cannot be made
     def get_sub_analysis_metadata_by_id(self, analysis_id: str, sub_analysis_id: str) -> Dict[str, Any]:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 return IntezerApi.get_sub_analysis_metadata_by_id(
                     self=self, composed_analysis_id=analysis_id, sub_analysis_id=sub_analysis_id
                 )
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to get sub_analyses metadata for analysis ID {analysis_id} and sub-analysis ID {sub_analysis_id} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to get sub_analyses metadata for analysis ID {analysis_id} and sub-analysis ID {sub_analysis_id} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -294,6 +318,7 @@ class ALIntezerApi(IntezerApi):
     # Overriding the class method to handle if the HTTPError exists
     def download_file_by_sha256(self, sha256: str, dir_path: str) -> bool:
         # We will try to connect with the REST API... NO MATTER WHAT
+        logged = False
         while True:
             try:
                 IntezerApi.download_file_by_sha256(
@@ -301,10 +326,12 @@ class ALIntezerApi(IntezerApi):
                 )
                 return True
             except ConnectionError as e:
-                self.log.error(
-                    "The intezer web service is most likely down. "
-                    f"Indicator: Unable to download file for SHA256 {sha256} due to '{e}'."
-                )
+                if not logged:
+                    self.log.error(
+                        "The intezer web service is most likely down. "
+                        f"Indicator: Unable to download file for SHA256 {sha256} due to '{e}'."
+                    )
+                    logged = True
                 sleep(5)
                 continue
             except HTTPError as e:
@@ -315,10 +342,12 @@ class ALIntezerApi(IntezerApi):
                     )
                     return False
                 else:
-                    self.log.error(
-                        "The intezer web service is most likely down. "
-                        f"Indicator: Unable to download file for SHA256 {sha256} due to '{e}'."
-                    )
+                    if not logged:
+                        self.log.error(
+                            "The intezer web service is most likely down. "
+                            f"Indicator: Unable to download file for SHA256 {sha256} due to '{e}'."
+                        )
+                        logged = True
                     sleep(5)
                     continue
             except FileExistsError as e:
