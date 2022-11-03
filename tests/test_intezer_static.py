@@ -647,8 +647,8 @@ class TestIntezerStatic:
 
     @staticmethod
     def test_process_extraction_info(intezer_static_class_instance):
-        from assemblyline_v4_service.common.dynamic_service_helper import SandboxOntology
-        so = SandboxOntology()
+        from assemblyline_v4_service.common.dynamic_service_helper import OntologyResults
+        so = OntologyResults()
 
         processes = [
             {
@@ -680,19 +680,26 @@ class TestIntezerStatic:
         command_line_set = set()
         correct_processes = [
             {
-                "start_time": float("-inf"),
-                "end_time": float("inf"),
+                "start_time": '1-01-01 00:00:00',
+                "end_time": '9999-12-31 23:59:59',
                 "objectid": {
+                    'ontology_id': 'process_FgezEeHOzrsPT9RyqA3MZ',
+                    'processtree': None,
+                    'service_name': 'IntezerStatic',
+                    'session': None,
                     "tag": "blah.exe",
                     "treeid": None,
                     "processtree": None,
-                    "time_observed": float("-inf")
+                    "time_observed": '1-01-01 00:00:00'
                 },
-                "pobjectid": {
-                    "tag": "blah3.exe",
-                    "treeid": None,
-                    "processtree": None,
-                    "time_observed": float("-inf")
+                'pobjectid': {
+                    'ontology_id': 'process_3gQblYLmzfdmdQEWr6IOAw',
+                    'processtree': None,
+                    'service_name': 'IntezerStatic',
+                    'session': None,
+                    'tag': 'blah3.exe',
+                    'time_observed': '1-01-01 00:00:00',
+                    'treeid': None
                 },
                 "pimage": "blah3.exe",
                 "pcommand_line": None,
@@ -705,19 +712,26 @@ class TestIntezerStatic:
                 "original_file_name": None,
             },
             {
-                "start_time": float("-inf"),
-                "end_time": float("inf"),
+                "start_time": '1-01-01 00:00:00',
+                "end_time": '9999-12-31 23:59:59',
                 "objectid": {
+                    'ontology_id': 'process_3mkF9MLqHlxJQCAG7ViEOu',
+                    'processtree': None,
+                    'service_name': 'IntezerStatic',
+                    'session': None,
                     "tag": "blah2.exe",
                     "treeid": None,
                     "processtree": None,
-                    "time_observed": float("-inf")
+                    "time_observed": '1-01-01 00:00:00'
                 },
-                "pobjectid": {
-                    "tag": "blah3.exe",
-                    "treeid": None,
-                    "processtree": None,
-                    "time_observed": float("-inf")
+                'pobjectid': {
+                    'ontology_id': 'process_3gQblYLmzfdmdQEWr6IOAw',
+                    'processtree': None,
+                    'service_name': 'IntezerStatic',
+                    'session': None,
+                    'tag': 'blah3.exe',
+                    'time_observed': '1-01-01 00:00:00',
+                    'treeid': None
                 },
                 "pimage": "blah3.exe",
                 "pcommand_line": None,
@@ -730,20 +744,19 @@ class TestIntezerStatic:
                 "original_file_name": None,
             },
             {
-                "start_time": float("-inf"),
-                "end_time": float("inf"),
+                "start_time": '1-01-01 00:00:00',
+                "end_time": '9999-12-31 23:59:59',
                 "objectid": {
+                    'ontology_id': 'process_3gQblYLmzfdmdQEWr6IOAw',
+                    'processtree': None,
+                    'service_name': 'IntezerStatic',
+                    'session': None,
                     "tag": "blah3.exe",
                     "treeid": None,
                     "processtree": None,
-                    "time_observed": float("-inf")
+                    "time_observed": '1-01-01 00:00:00'
                 },
-                "pobjectid": {
-                    "tag": None,
-                    "treeid": None,
-                    "processtree": None,
-                    "time_observed": None
-                },
+                'pobjectid': None,
                 "pimage": None,
                 "pcommand_line": None,
                 "ppid": 322,
@@ -759,7 +772,8 @@ class TestIntezerStatic:
         for index, process in enumerate(so.get_processes()):
             process_as_primitives = process.as_primitives()
             process_as_primitives["objectid"].pop("guid")
-            process_as_primitives["pobjectid"].pop("guid")
+            if process_as_primitives["pobjectid"] is not None:
+                process_as_primitives["pobjectid"].pop("guid")
             assert process_as_primitives == correct_processes[index]
         assert process_path_set == {"blah.dll,blah", "blah2.dll,blah", "blah2.exe", "blah.exe", "blah3.exe"}
         assert command_line_set == {"blah.exe blah.dll,blah", "blah2.exe blah2.dll,blah"}
