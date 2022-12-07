@@ -134,6 +134,9 @@ class ALIntezerApi(IntezerApi):
     def set_logger(self, log):
         self.log = log
 
+    def set_retry_forever(self, retry_forever: bool):
+        self.retry_forever: bool = retry_forever
+
     # Overriding the class method to handle if the URL is GONE
     def get_latest_analysis(self,
                             file_hash: str,
@@ -156,8 +159,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to get the latest analysis for SHA256 {file_hash} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 # Occasionally an analysis fails, and HTTPError.GONE is raised
                 if str(HTTPStatus.GONE.value) in repr(e) or HTTPStatus.GONE.name in repr(e):
@@ -172,8 +178,11 @@ class ALIntezerApi(IntezerApi):
                             f"Indicator: Unable to get the latest analysis for SHA256 {file_hash} due to '{e}'."
                         )
                         logged = True
-                    sleep(5)
-                    continue
+                    if self.retry_forever:
+                        sleep(5)
+                        continue
+                    else:
+                        raise
 
     # Overriding the class method to handle if the HTTPError exists
     def get_iocs(self, analysis_id: str) -> Dict[str, List[Dict[str, str]]]:
@@ -189,8 +198,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to retrieve IOCs for analysis ID {analysis_id} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 # If you have a community account with analyze.intezer.com, you will get a 403 FORBIDDEN on this endpoint.
                 if str(HTTPStatus.FORBIDDEN.value) in repr(e) or HTTPStatus.FORBIDDEN.name in repr(e):
@@ -205,8 +217,11 @@ class ALIntezerApi(IntezerApi):
                             f"Indicator: Unable to retrieve IOCs for analysis ID {analysis_id} due to '{e}'."
                         )
                         logged = True
-                    sleep(5)
-                    continue
+                    if self.retry_forever:
+                        sleep(5)
+                        continue
+                    else:
+                        raise
 
     # Overriding the class method to handle if the HTTPError or UnsupportedOnPremiseVersion exists
     def get_dynamic_ttps(self, analysis_id: str) -> List[Dict[str, str]]:
@@ -222,8 +237,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 # If you have a community account with analyze.intezer.com, you will get a 403 FORBIDDEN on this endpoint.
                 if str(HTTPStatus.FORBIDDEN.value) in repr(e) or HTTPStatus.FORBIDDEN.name in repr(e):
@@ -238,8 +256,11 @@ class ALIntezerApi(IntezerApi):
                             f"Indicator: Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
                         )
                         logged = True
-                    sleep(5)
-                    continue
+                    if self.retry_forever:
+                        sleep(5)
+                        continue
+                    else:
+                        raise
             except UnsupportedOnPremiseVersion as e:
                 self.log.debug(
                     f"Unable to retrieve TTPs for analysis ID {analysis_id} due to '{e}'."
@@ -260,8 +281,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to get sub_analyses for analysis ID {analysis_id} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 self.log.debug(
                     f"Unable to get sub_analyses for analysis ID {analysis_id} due to '{e}'."
@@ -284,8 +308,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to get sub_analyses code re-use for analysis ID {analysis_id} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 self.log.debug(
                     f"Unable to get sub_analyses code re-use for analysis ID {analysis_id} due to '{e}'."
@@ -308,8 +335,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to get sub_analyses metadata for analysis ID {analysis_id} and sub-analysis ID {sub_analysis_id} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 self.log.debug(
                     f"Unable to get sub_analyses metadata for analysis ID {analysis_id} and sub-analysis ID {sub_analysis_id} due to '{e}'."
@@ -333,8 +363,11 @@ class ALIntezerApi(IntezerApi):
                         f"Indicator: Unable to download file for SHA256 {sha256} due to '{e}'."
                     )
                     logged = True
-                sleep(5)
-                continue
+                if self.retry_forever:
+                    sleep(5)
+                    continue
+                else:
+                    raise
             except HTTPError as e:
                 # If you have a community account with analyze.intezer.com, you will get a 403 FORBIDDEN on this endpoint.
                 if str(HTTPStatus.FORBIDDEN.value) in repr(e) or HTTPStatus.FORBIDDEN.name in repr(e):
@@ -349,8 +382,11 @@ class ALIntezerApi(IntezerApi):
                             f"Indicator: Unable to download file for SHA256 {sha256} due to '{e}'."
                         )
                         logged = True
-                    sleep(5)
-                    continue
+                    if self.retry_forever:
+                        sleep(5)
+                        continue
+                    else:
+                        raise
             except FileExistsError as e:
                 # Duplicate file
                 self.log.debug(
@@ -380,6 +416,7 @@ class IntezerStatic(ServiceBase):
             on_premise_version=OnPremiseVersion.V21_11 if self.config["is_on_premise"] else None
         )
         self.client.set_logger(self.log)
+        self.client.set_retry_forever(self.config.get("retry_forever", False))
         try:
             global_safelist = self.get_api_interface().get_safelist()
         except ServiceAPIError as e:

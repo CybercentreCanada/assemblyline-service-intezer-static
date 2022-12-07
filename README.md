@@ -24,6 +24,7 @@ If you are using an Intezer Analyze On-Premise solution, then you do not need to
 * **api_key**: This is the 36 character key provided to you by [Intezer](https://www.intezer.com/blog/malware-analysis/api-intezer-analyze-community/).
 * **private_only**: This is a flag that will only return private submissions on the Intezer Analyze system, if selected.
 * **is_on_premise**: This is a flag used for indicating if the Intezer Analyze system is on-premise, rather than the cloud API.
+* **retry_forever**: This is a flag used for indicating if the service should poll the Intezer Analyze system until it gets a response. If set to `false`, the service will raise an exception immediately.
 
 ### Submission Parameters
 * **analysis_id**: This is the analysis ID of an analysis that is already on the system. The cloud API counts retrieving the analysis by file hash as a "File Scan" which counts towards an account's monthly quota. We can circumvent this by submitting the analysis ID of an analysis. That being said, this will ignore the file that you submit to Assemblyline.
