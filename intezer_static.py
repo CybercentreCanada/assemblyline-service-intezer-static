@@ -147,7 +147,7 @@ class ALIntezerApi(IntezerApi):
                     self=self,
                     file_hash=file_hash,
                     private_only=private_only,
-                    additional_parameters=additional_parameters
+                    **additional_parameters
                 )
             except ConnectionError as e:
                 if not logged:
