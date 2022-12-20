@@ -33,6 +33,7 @@ config:
   private_only: false
   is_on_premise: false
   retry_forever: true
+  try_to_download_every_file: false
 
 submission_params:
   - default: ""
