@@ -1,3 +1,5 @@
+# THIS SERVICE HAS BEEN DEPRECATED IN FAVOUR OF THE [INTEZER](https://github.com/CybercentreCanada/assemblyline-service-intezer) SERVICE
+
 # IntezerStatic service
 This repository is an Assemblyline service that fetches the Intezer report for the SHA256 of a submitted file, and if the SHA256 was not found on the Intezer instance, then this service will DO NOTHING MORE.
 
